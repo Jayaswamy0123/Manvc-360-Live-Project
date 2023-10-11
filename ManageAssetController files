@@ -1,0 +1,25 @@
+[HttpPost("[action]")]
+public async Task<ActionResult<Asset_SubCategory>> AddAssetSubCategory([FromBody] AddAssetSubCategory addAssetCategory)
+{
+    var check = await _context.Asset_SubCategory.Where(x => x.Asset_Sub_Category.Replace(" ", string.Empty)
+                                                                     .ToLower() == addAssetCategory.assetSubCategotyType
+                                                                     .Replace(" ", string.Empty)
+                                                                     .ToLower() && x.FK_AssetCategory_Id == addAssetCategory.assetCategoryID)
+                                             .AnyAsync();
+    if (check == true)
+        return StatusCode(400, "already exists");
+    try
+    {
+        Asset_SubCategory data = new Asset_SubCategory();
+        data.Asset_Sub_Category = addAssetCategory.assetSubCategotyType;
+        data.IsActive = addAssetCategory.isActive;
+        data.FK_AssetCategory_Id = addAssetCategory.assetCategoryID;
+        data.Last_Updated_Date = addAssetCategory.Last_Updated_Date;
+        _context.Asset_SubCategory.Add(data);
+        await _context.SaveChangesAsync();
+        return CreatedAtAction("GetAssetCategory", data);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"Internal server error: {ex.Message}");
+    }
