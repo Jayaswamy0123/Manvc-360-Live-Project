@@ -1,0 +1,23 @@
+[HttpDelete("[action]")]
+        public async Task<ActionResult> DeleteAssetSubCategory([FromBody] int assetSubCategoryId)
+        {
+            try
+            {
+                var subCategoryToDelete = await _context.Asset_SubCategory
+                    .Where(x => x.AssetSubCategory_ID == assetSubCategoryId)
+                    .FirstOrDefaultAsync();
+
+                if (subCategoryToDelete == null)
+                {
+                    return NotFound("Asset_SubCategory not found");
+                }
+
+                _context.Asset_SubCategory.Remove(subCategoryToDelete);
+                await _context.SaveChangesAsync();
+                return Ok("Asset_SubCategory deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
